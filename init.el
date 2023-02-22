@@ -32,7 +32,9 @@ There are two things you can do about this warning:
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-
+;; install font
+(add-to-list 'default-frame-alist' '(font . "DejaVu Sans Mono-11"))
+(set-face-attribute 'default t :font "DejaVu Sans Mono-11")
 ;; Install the package if not available yet
 (use-package use-package
   :custom
@@ -434,16 +436,23 @@ p  "To be called when leaving `org-present-mode' : disables the various presenta
 
 ;;;; web-mode : Support various web files
 (use-package web-mode
-  :mode ("\\.css\\'" "\\.html\\'" "\\.ts\\'" "\\.js\\'" "\\.vue\\'")
+  :mode ("\\.css\\'" "\\.html\\'" "\\.ts\\'" "\\.js\\'")
+  ;; :mode ("\\.css\\'" "\\.html\\'" "\\.ts\\'" "\\.js\\'" "\\.vue\\'")
   :hook
-  (web-mode . (lambda () (when (match-buffer-extension "ts" "js" "vue")
+  (web-mode . (lambda () (when (match-buffer-extension "ts" "js")
                            (lsp-deferred)
                            (setq-local lsp-auto-format t))))
   :custom
   (web-mode-script-padding 0) ; For vue.js SFC : no initial padding in the script section
   (web-mode-markup-indent-offset 2)) ; For html : use an indent of size 2 (default is 4)
-
-;;;; prettier-js : Formatting on save, used by my-ts-mode for .js and .ts files
+;;;; vue-language-server : Support Vue2 files
+;; (use-package vue-language-server
+;;      :mode ("\\.vue\\'")
+;;      :hook
+;;      (vue-language-server . (lambda () (when (match-buffer-extension "vue")
+;;                          (lsp-deferred)
+;;                          (setq-local lsp-auto-format t)))))
+;; ;;;; prettier-js : Formatting on save, used by my-ts-mode for .js and .ts files
 (use-package prettier-js
   :custom
   (prettier-js-show-errors nil)
@@ -681,24 +690,20 @@ This mark-ring will record all mark positions globally, multiple times per buffe
       (unless (and prev (marker-is-point-p prev))
         (push-mark))
       (push (copy-marker target) global-mark-previous)
+
+
+       
       (pop global-mark-next)
       (jump-to-marker target))))
 
-;;; Add plantuml
-(use-package plantuml-mode)
-
-(setq org-plantuml-jar-path (expand-file-name "/home/ilankeller/Documents/App/plantuml.jar"))
+;;; Add plantuml to org mode
+(setq org-plantuml-jar-path (expand-file-name "/home/elan/App/plantuml/plantuml-1.2022.14.jar"))
 (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
 (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
-
-;; Sample jar configuration
-    (setq plantuml-jar-path "/home/ilankeller/Documents/App/plantuml.jar")
-    (setq plantuml-default-exec-mode 'jar)
-
-    ;; Sample executable configuration
-    (setq plantuml-executable-path "/home/ilankeller/Documents/App/plantuml.jar")
-    (setq plantuml-default-exec-mode 'executable)
-(add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
+(add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml))
+ ;; Sample jar configuration
+ (setq plantuml-jar-path "/home/elan/App/plantuml/plantuml-1.2022.14.jar")
+ (setq plantuml-default-exec-mode 'jar)
 ;;; Custom section : modified when experimenting with the customize menu.
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -709,14 +714,14 @@ This mark-ring will record all mark positions globally, multiple times per buffe
    '(python-unittest qt-test gcc-info gcc-warning gcc-error jest-error link-error))
  '(ispell-dictionary nil)
  '(package-selected-packages
-   '(move-text lsp-ui eglot flycheck-plantuml yasnippet yaml-mode which-key web-mode vscode-dark-plus-theme visual-fill-column vertico use-package rainbow-delimiters projectile prettier-js plantuml-mode outline-minor-faces org-roam org-present org-bullets orderless marginalia magit lsp-pyright key-chord helpful flycheck expand-region esup doom-modeline diminish dap-mode csv-mode consult company all-the-icons ag)))
+   '(nix-mode dockerfile-mode vue-language-server vls move-text lsp-ui eglot flycheck-plantuml yasnippet yaml-mode which-key web-mode vscode-dark-plus-theme visual-fill-column vertico use-package rainbow-delimiters projectile prettier-js plantuml-mode outline-minor-faces org-roam org-present org-bullets orderless marginalia magit lsp-pyright key-chord helpful flycheck expand-region esup doom-modeline diminish dap-mode csv-mode consult company all-the-icons ag)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(completions-annotations ((t (:inherit 'shadow))))
- '(magit-filename ((t :foreground "white")))
+ '(magit-filename ((t :foreground "white")) t)
  '(mode-line ((t :background "black")))
  '(mode-line-inactive ((t :background "#333333")))
  '(orderless-match-face-0 ((t (:weight bold :foreground "gold1"))))
@@ -735,8 +740,11 @@ This mark-ring will record all mark positions globally, multiple times per buffe
 (global-set-key (kbd "C-l") "\C-a\C- \C-n\M-w\C-y")
 (global-set-key (kbd "C-d") 'delete-char)
 
-;;; emacs-w3m
- (setq browse-url-browser-function 'w3m-browse-url)
- (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
- ;; optional keyboard short-cut
- (global-set-key "\C-xm" 'browse-url-at-point)
+;; ;;; emacs-w3m
+;;  (setq browse-url-browser-function 'w3m-browse-url)
+;;  (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
+;;  ;; optional keyboard short-cut
+;;  (global-set-key "\C-xm" 'browse-url-at-point)
+
+;;; unable
+(global-unset-key (kbd "C-z"))
